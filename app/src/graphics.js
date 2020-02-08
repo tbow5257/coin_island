@@ -11,7 +11,7 @@ class ThreeContainer extends React.Component {
     }
 
     componentDidMount() {
-        console.log('is this on?');
+        console.log(this.props.boxY);
         const width = this.mount.clientWidth;
         const height = this.mount.clientHeight;
         const de2ra = (degree) => degree*(Math.PI/180);
@@ -32,11 +32,11 @@ class ThreeContainer extends React.Component {
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const geometry = new THREE.BoxGeometry(580, 580, 580);
         const material = new THREE.MeshLambertMaterial({ color: 0xff00ff , wireframe: false});
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(0, 790, -350);
-        cube.castShadow = true;
-        cube.receiveShadow = true;
-        scene.add(cube);
+        this.cube = new THREE.Mesh(geometry, material);
+        this.cube.position.set(0, this.props.boxY, -350);
+        this.cube.castShadow = true;
+        this.cube.receiveShadow = true;
+        scene.add(this.cube);
 
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -99,7 +99,6 @@ class ThreeContainer extends React.Component {
         this.camera = camera;
         this.renderer = renderer;
         this.material = material;
-        this.cube = cube;
 
         const geometry1 = new THREE.PlaneBufferGeometry( 10000, 5000);
         const material1 = new THREE.MeshPhongMaterial( {color: 0x23052a} );
@@ -115,6 +114,11 @@ class ThreeContainer extends React.Component {
         this.mount.appendChild(this.renderer.domElement);
 
         this.start();
+    }
+
+    componentDidUpdate() {
+        console.log(this.props.boxY);
+        this.cube.position.set(0, this.props.boxY, -350);
     }
 
     componentWillUnmount() {
