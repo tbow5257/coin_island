@@ -27,7 +27,6 @@ class PriceGrabber extends React.Component {
 
     changeCoin(coin) {
         if (this.state.currentCoin === coin) {
-            console.log('o i returnin');
             return;
         }
         this.setState({currentCoin: coin}, this.priceAndCalc);
@@ -35,7 +34,6 @@ class PriceGrabber extends React.Component {
 
     changeDate(newDateRange) {
         if (this.state.dateRange === newDateRange) {
-            console.log('o i returnin');
             return;
         }
         this.setState({dateRange: newDateRange}, () => calcPercentage(this.state.currentCoin, this.state.currentPrice, this.state.dateRange)

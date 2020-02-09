@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
+import SkyAsset from './assets/kisspng-skybox.png';
 
 class ThreeContainer extends React.Component {
     constructor(props) {
@@ -11,7 +12,6 @@ class ThreeContainer extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.boxY);
         const width = this.mount.clientWidth;
         const height = this.mount.clientHeight;
         const de2ra = (degree) => degree*(Math.PI/180);
@@ -100,8 +100,31 @@ class ThreeContainer extends React.Component {
         this.renderer = renderer;
         this.material = material;
 
+        //trying skybox 
+        console.log(SkyAsset)
+        var skyboxGeometry = new THREE.SphereGeometry(3000, 60, 40);  
+        var skyboxUniforms = {  
+            texture: { type: 't', value: THREE.ImageUtils.loadTexture({SkyAsset}) }
+        };
+
+        var material = new THREE.ShaderMaterial( {  
+            uniforms:       uniforms,
+            vertexShader:   document.getElementById('sky-vertex').textContent,
+            fragmentShader: document.getElementById('sky-fragment').textContent
+        });
+        
+        skyBox = new THREE.Mesh(geometry, material);  
+        skyBox.scale.set(-1, 1, 1);  
+        skyBox.eulerOrder = 'XZY';  
+        skyBox.renderDepth = 1000.0;  
+        scene.add(skyBox);  
+        
+
+
+
+
         const geometry1 = new THREE.PlaneBufferGeometry( 10000, 5000);
-        const material1 = new THREE.MeshPhongMaterial( {color: 0x23052a} );
+        const material1 = new THREE.MeshPhongMaterial( {color: 0x34aae0} );
         const plane = new THREE.Mesh( geometry1, material1 );
         plane.rotation.x = de2ra(-90);
         plane.position.set(0, -950, -500);
@@ -117,7 +140,6 @@ class ThreeContainer extends React.Component {
     }
 
     componentDidUpdate() {
-        console.log(this.props.boxY);
         this.cube.position.set(0, this.props.boxY, -350);
     }
 

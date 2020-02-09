@@ -14,8 +14,8 @@ const App = () => {
 
     return (
         <section>
-            {/* <Graphics boxY={testMove}/> */}
-            <PriceGrabber />
+            <Graphics boxY={testMove}/>
+            {/* <PriceGrabber /> */}
             <h1>SO it beginz</h1>
         </section>
     );
