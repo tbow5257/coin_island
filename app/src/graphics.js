@@ -12,13 +12,11 @@ class ThreeContainer extends React.Component {
     }
 
     componentDidMount() {
+
+        // Width-height and Camera
         const width = this.mount.clientWidth;
         const height = this.mount.clientHeight;
         const de2ra = (degree) => degree*(Math.PI/180);
-
-        const scene = new THREE.Scene();
-        const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
-        scene.add(ambientLight);
         const camera = new THREE.PerspectiveCamera(
             75,
             width / height,
@@ -28,16 +26,11 @@ class ThreeContainer extends React.Component {
         camera.position.set(0,1000, 1500);
         camera.rotation.x = de2ra(-30);
 
+        // Scene
+        const scene = new THREE.Scene();
 
+        // Renderer
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        const geometry = new THREE.BoxGeometry(580, 580, 580);
-        const material = new THREE.MeshLambertMaterial({ color: 0xff00ff , wireframe: false});
-        this.cube = new THREE.Mesh(geometry, material);
-        this.cube.position.set(0, this.props.boxY, -350);
-        this.cube.castShadow = true;
-        this.cube.receiveShadow = true;
-        scene.add(this.cube);
-
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.sortObjects = false;
@@ -47,13 +40,41 @@ class ThreeContainer extends React.Component {
         renderer.gammaOutput = true;
 
 
-        const geometry2 = new THREE.PlaneBufferGeometry( 10000, 10000 );
-        const backwallMaterial = new THREE.MeshPhongMaterial( { color: 0x082139 } );
-        const backwall = new THREE.Mesh( geometry2, backwallMaterial );
-        backwall.position.set( 0, 0, -1600 );
-        backwall.scale.set( 1, 1, 1 );
-        backwall.castShadow = true;
-        backwall.receiveShadow = true;
+        const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
+        scene.add(ambientLight);
+
+
+
+        function theCube() {
+            const geometry = new THREE.BoxGeometry(580, 580, 580);
+            const material = new THREE.MeshLambertMaterial({ color: 0xff00ff , wireframe: false});
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(0, 600, -350);
+            cube.castShadow = true;
+            cube.receiveShadow = true;  
+
+            return cube;
+            
+        }
+
+        const cube = theCube();
+        this.cube = cube;
+        scene.add(this.cube);  
+
+        function theBackwall() {
+            const geometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
+            const material = new THREE.MeshPhongMaterial( { color: 0x082139 } );
+            const backwall = new THREE.Mesh( geometry, material );
+            backwall.position.set( 0, 0, -1600 );
+            backwall.scale.set( 1, 1, 1 );
+            backwall.castShadow = true;
+            backwall.receiveShadow = true;
+
+            return backwall;
+        }
+
+        const backwall = theBackwall();
+
         scene.add( backwall );
 
         //LIGHTS
@@ -94,30 +115,30 @@ class ThreeContainer extends React.Component {
         // light.position.set( 10, 0, 10 );
         // scene.add(light);
 
-
+        // bind variables
         this.scene = scene;
         this.camera = camera;
         this.renderer = renderer;
-        this.material = material;
+        // this.material = material;
 
         //trying skybox 
-        console.log(SkyAsset)
-        var skyboxGeometry = new THREE.SphereGeometry(3000, 60, 40);  
-        var skyboxUniforms = {  
-            texture: { type: 't', value: THREE.ImageUtils.loadTexture({SkyAsset}) }
-        };
+        // console.log(SkyAsset)
+        // var skyboxGeometry = new THREE.SphereGeometry(3000, 60, 40);  
+        // var skyboxUniforms = {  
+        //     texture: { type: 't', value: THREE.ImageUtils.loadTexture({SkyAsset}) }
+        // };
 
-        var material = new THREE.ShaderMaterial( {  
-            uniforms:       uniforms,
-            vertexShader:   document.getElementById('sky-vertex').textContent,
-            fragmentShader: document.getElementById('sky-fragment').textContent
-        });
+        // var material = new THREE.ShaderMaterial( {  
+        //     uniforms:       uniforms,
+        //     vertexShader:   document.getElementById('sky-vertex').textContent,
+        //     fragmentShader: document.getElementById('sky-fragment').textContent
+        // });
         
-        skyBox = new THREE.Mesh(geometry, material);  
-        skyBox.scale.set(-1, 1, 1);  
-        skyBox.eulerOrder = 'XZY';  
-        skyBox.renderDepth = 1000.0;  
-        scene.add(skyBox);  
+        // skyBox = new THREE.Mesh(geometry, material);  
+        // skyBox.scale.set(-1, 1, 1);  
+        // skyBox.eulerOrder = 'XZY';  
+        // skyBox.renderDepth = 1000.0;  
+        // scene.add(skyBox);  
         
 
 
@@ -140,7 +161,7 @@ class ThreeContainer extends React.Component {
     }
 
     componentDidUpdate() {
-        this.cube.position.set(0, this.props.boxY, -350);
+        // this.cube.position.set(0, this.props.boxY, -350);
     }
 
     componentWillUnmount() {
@@ -159,6 +180,7 @@ class ThreeContainer extends React.Component {
     }
 
     animate() {
+        // console.log(this.acube.cube)
         this.cube.rotation.x += 0.01;
         this.cube.rotation.y += 0.01;
 
