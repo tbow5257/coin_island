@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from '../../node_modules/three/examples/jsm/GLTFLoader.js';
 import SkyAsset from './assets/kisspng-skybox.png';
 
 class ThreeContainer extends React.Component {
@@ -43,7 +44,7 @@ class ThreeContainer extends React.Component {
         const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
         scene.add(ambientLight);
 
-
+        
 
         function theCube() {
             const geometry = new THREE.BoxGeometry(580, 580, 580);
