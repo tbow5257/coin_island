@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from '../../node_modules/three/examples/jsm/GLTFLoader.js';
 import SkyAsset from './assets/kisspng-skybox.png';
+import rockModel from './assets/limestone-outcrop-4/source/Duranne4_test2.glb'
+
+const jsmLoad = require("../node_modules/three/examples/jsm/loaders/GLTFLoader.js")
 
 class ThreeContainer extends React.Component {
     constructor(props) {
@@ -40,11 +42,17 @@ class ThreeContainer extends React.Component {
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
 
-
+        // lights
         const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
         scene.add(ambientLight);
 
-        
+        const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.castShadow = true;
+        directionalLight.position.set(0, 500, 700);
+        directionalLight.target.position.set(-4, 0, -4);
+
+        scene.add(directionalLight);
+        scene.add(directionalLight.target);
 
         function theCube() {
             const geometry = new THREE.BoxGeometry(580, 580, 580);
@@ -57,6 +65,18 @@ class ThreeContainer extends React.Component {
             return cube;
             
         }
+
+        let rockLoader = new jsmLoad.GLTFLoader();
+        rockLoader.load(rockModel, function(gltf) {
+            const rock = gltf.scene.children[0];
+            rock.position.set(1111, 200, -150);
+            rock.scale.set(30,30,30)
+            rock.castShadow = true;
+            scene.add(gltf.scene);
+        });
+        
+
+
 
         const cube = theCube();
         this.cube = cube;
@@ -181,7 +201,7 @@ class ThreeContainer extends React.Component {
     }
 
     animate() {
-        // console.log(this.acube.cube)
+        // // console.log(this.acube.cube)
         this.cube.rotation.x += 0.01;
         this.cube.rotation.y += 0.01;
 
