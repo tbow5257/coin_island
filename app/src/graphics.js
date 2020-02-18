@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
-import SkyAsset from './assets/kisspng-skybox.png';
-import rockModel from './assets/limestone-outcrop-4/source/Duranne4_test2.glb'
+// import SkyAsset from './assets/kisspng-skybox.png';
+import rockModel from './assets/island/low_poly_island.glb'
 
 const jsmLoad = require("../node_modules/three/examples/jsm/loaders/GLTFLoader.js")
 
@@ -12,6 +12,16 @@ class ThreeContainer extends React.Component {
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
         this.animate = this.animate.bind(this)
+        this.handleResize = this.handleResize.bind(this);
+    }
+
+    handleResize() {
+        const width = this.mount.clientWidth;
+        const height = this.mount.clientHeight;
+        this.renderer.setSize(width, height)
+        this.camera.aspect = width / height
+        this.camera.updateProjectionMatrix();
+        this.renderScene()
     }
 
     componentDidMount() {
@@ -26,7 +36,7 @@ class ThreeContainer extends React.Component {
             1,
             10000
         );
-        camera.position.set(0,1000, 1500);
+        camera.position.set(0, 1000, 1500);
         camera.rotation.x = de2ra(-30);
 
         // Scene
@@ -43,8 +53,8 @@ class ThreeContainer extends React.Component {
         renderer.gammaOutput = true;
 
         // lights
-        const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
-        scene.add(ambientLight);
+        // const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
+        // scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.castShadow = true;
@@ -55,7 +65,7 @@ class ThreeContainer extends React.Component {
         scene.add(directionalLight.target);
 
         function theCube() {
-            const geometry = new THREE.BoxGeometry(580, 580, 580);
+            const geometry = new THREE.BoxGeometry(280, 280, 280);
             const material = new THREE.MeshLambertMaterial({ color: 0xff00ff , wireframe: false});
             const cube = new THREE.Mesh(geometry, material);
             cube.position.set(0, 600, -350);
@@ -68,54 +78,20 @@ class ThreeContainer extends React.Component {
 
         let rockLoader = new jsmLoad.GLTFLoader();
         rockLoader.load(rockModel, function(gltf) {
-            const rock = gltf.scene.children[0];
-            rock.position.set(1111, 200, -150);
-            rock.scale.set(30,30,30)
+            const rock = gltf.scene.children[2];
+            rock.position.set(211, 200, -150);
+            rock.scale.set(50,50,50)
             rock.castShadow = true;
             scene.add(gltf.scene);
         });
         
 
 
-
         const cube = theCube();
         this.cube = cube;
         scene.add(this.cube);  
 
-        function theBackwall() {
-            const geometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
-            const material = new THREE.MeshPhongMaterial( { color: 0x082139 } );
-            const backwall = new THREE.Mesh( geometry, material );
-            backwall.position.set( 0, 0, -1600 );
-            backwall.scale.set( 1, 1, 1 );
-            backwall.castShadow = true;
-            backwall.receiveShadow = true;
 
-            return backwall;
-        }
-
-        const backwall = theBackwall();
-
-        scene.add( backwall );
-
-        //LIGHTS
-        //
-        // const directionalLight = new THREE.DirectionalLight( 0xffffff, 0 );
-        // scene.add(directionalLight);
-        //
-        // const spotLight = new THREE.SpotLight( 0x6d0e6c, .5 );
-        // spotLight.position.set( 0, 5200, 2800 );
-        // spotLight.castShadow = true;
-        // spotLight.shadow.mapSize.width = 2048;
-        // spotLight.shadow.mapSize.height = 2048;
-        // spotLight.angle = .74;
-        // spotLight.penumbra = 1;
-        // spotLight.intensity = 0;
-        // spotLight.decay = 4;
-        // spotLight.distance = 12000;
-        // spotLight.castShadow = true;
-        //
-        // scene.add( spotLight );
 
         var spotLight = new THREE.SpotLight( 0xffffff );
         spotLight.position.set( 1500, 4000, 350 );
@@ -131,10 +107,6 @@ class ThreeContainer extends React.Component {
 
         scene.add( spotLight );
 
-
-        // var light = new THREE.PointLight(  );
-        // light.position.set( 10, 0, 10 );
-        // scene.add(light);
 
         // bind variables
         this.scene = scene;
@@ -159,14 +131,22 @@ class ThreeContainer extends React.Component {
         // skyBox.scale.set(-1, 1, 1);  
         // skyBox.eulerOrder = 'XZY';  
         // skyBox.renderDepth = 1000.0;  
-        // scene.add(skyBox);  
-        
+        // scene.add(skyBox); 
 
-
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('https://threejsfundamentals.org/threejs/resources/images/checker.png');
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.magFilter = THREE.NearestFilter;
+        const repeats = 10 / 2;
+        texture.repeat.set(repeats, repeats);
 
 
         const geometry1 = new THREE.PlaneBufferGeometry( 10000, 5000);
-        const material1 = new THREE.MeshPhongMaterial( {color: 0x34aae0} );
+        const material1 = new THREE.MeshPhongMaterial({
+            map: texture,
+            side: THREE.DoubleSide
+        });
         const plane = new THREE.Mesh( geometry1, material1 );
         plane.rotation.x = de2ra(-90);
         plane.position.set(0, -950, -500);
@@ -175,9 +155,10 @@ class ThreeContainer extends React.Component {
         plane.receiveShadow = true;
         scene.add( plane );
 
-
+        console.log('finalScene ', scene);
         this.mount.appendChild(this.renderer.domElement);
 
+        window.addEventListener('resize', this.handleResize)
         this.start();
     }
 
