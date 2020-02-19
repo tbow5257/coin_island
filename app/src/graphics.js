@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
+import waterEffect from './water-material';
 // import SkyAsset from './assets/kisspng-skybox.png';
 import rockModel from './assets/island/low_poly_island.glb'
 
@@ -58,8 +59,8 @@ class ThreeContainer extends React.Component {
 
         const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.castShadow = true;
-        directionalLight.position.set(0, 500, 700);
-        directionalLight.target.position.set(-4, 0, -4);
+        directionalLight.position.set(-900, 500, 700);
+        // directionalLight.target.position.set(-4, 0, -4);
 
         scene.add(directionalLight);
         scene.add(directionalLight.target);
@@ -91,6 +92,38 @@ class ThreeContainer extends React.Component {
         this.cube = cube;
         scene.add(this.cube);  
 
+        //water part
+        // Load textures		
+		var waterNormals = new THREE.ImageUtils.loadTexture('./assets/img/waternormals.jpg');
+		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
+
+
+        // Create the water effect
+		this.ms_Water = new waterEffect(renderer, camera, scene, {
+			textureWidth: 256,
+			textureHeight: 256,
+			waterNormals: waterNormals,
+			alpha: 	1.0,
+			sunDirection: directionalLight.position.normalize(),
+			sunColor: 0xffffff,
+			waterColor: 0x001e0f,
+			betaVersion: 0,
+			side: THREE.DoubleSide
+		});
+		var aMeshMirror = new THREE.Mesh(
+			new THREE.PlaneBufferGeometry(2000, 2000, 10, 10), 
+			this.ms_Water.material
+		);
+		aMeshMirror.add(this.ms_Water);
+        aMeshMirror.rotation.x = - Math.PI * 0.5;
+        this.ms_Water.position.set(0, -950, -500)
+
+        aMeshMirror.position.set(0, -950, -500)
+
+        scene.add(this.ms_Water)
+        scene.add(aMeshMirror);
+
+        console.log(this.ms_Water);
 
 
         var spotLight = new THREE.SpotLight( 0xffffff );
@@ -153,13 +186,14 @@ class ThreeContainer extends React.Component {
         plane.scale.set(1,1,1);
         plane.castShadow = false;
         plane.receiveShadow = true;
-        scene.add( plane );
+        // scene.add( plane );
 
         console.log('finalScene ', scene);
         this.mount.appendChild(this.renderer.domElement);
 
         window.addEventListener('resize', this.handleResize)
         this.start();
+        
     }
 
     componentDidUpdate() {
@@ -185,12 +219,16 @@ class ThreeContainer extends React.Component {
         // // console.log(this.acube.cube)
         this.cube.rotation.x += 0.01;
         this.cube.rotation.y += 0.01;
+        // this.ms_Water.render();
 
         this.renderScene();
         this.frameId = window.requestAnimationFrame(this.animate);
     }
 
     renderScene() {
+            // this.ms_Water.render();
+
+        // this.ms_Water.render();
         this.renderer.render(this.scene, this.camera);
     }
 
