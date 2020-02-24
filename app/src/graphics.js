@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
 // import SkyAsset from './assets/kisspng-skybox.png';
-import rockModel from './assets/island/low_poly_island.glb'
+import islandModel from './assets/island/low_poly_island.glb'
 
 const jsmLoad = require("../node_modules/three/examples/jsm/loaders/GLTFLoader.js")
 
@@ -36,8 +36,7 @@ class ThreeContainer extends React.Component {
             1,
             10000
         );
-        camera.position.set(0, 1000, 1500);
-        camera.rotation.x = de2ra(-30);
+        camera.position.set(150, 1000, 1500);
 
         // Scene
         const scene = new THREE.Scene();
@@ -52,60 +51,107 @@ class ThreeContainer extends React.Component {
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
 
+        camera.lookAt(scene.position)
+
+        // Clock
+        this.clock = new THREE.Clock();
+
         // lights
         // const ambientLight = new THREE.AmbientLight( 0xffffff, 0 );
         // scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.castShadow = true;
-        directionalLight.position.set(0, 500, 700);
-        directionalLight.target.position.set(-4, 0, -4);
+        directionalLight.position.set(0, 900, 500);
+        directionalLight.target.position.set(0, 200, -250);
 
         scene.add(directionalLight);
-        scene.add(directionalLight.target);
+        // scene.add(directionalLight.target);
 
-        function theCube() {
+        const axesHelper = new THREE.AxesHelper(500);
+        scene.add( axesHelper );
+
+        function redCube() {
             const geometry = new THREE.BoxGeometry(280, 280, 280);
-            const material = new THREE.MeshLambertMaterial({ color: 0xff00ff , wireframe: false});
+            const material = new THREE.MeshLambertMaterial({ color: 0xff0000 , wireframe: false});
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(-330, 600, -350);
+            cube.castShadow = true;
+            cube.receiveShadow = true;  
+            return cube;
+        }
+
+
+        function blueCube() {
+            const geometry = new THREE.BoxGeometry(280, 280, 280);
+            const material = new THREE.MeshLambertMaterial({ color: 0x99ff , wireframe: false});
             const cube = new THREE.Mesh(geometry, material);
             cube.position.set(0, 600, -350);
             cube.castShadow = true;
             cube.receiveShadow = true;  
 
             return cube;
-            
         }
 
-        let rockLoader = new jsmLoad.GLTFLoader();
-        rockLoader.load(rockModel, function(gltf) {
-            const rock = gltf.scene.children[2];
-            rock.position.set(211, 200, -150);
-            rock.scale.set(50,50,50)
-            rock.castShadow = true;
-            scene.add(gltf.scene);
-        });
-        
+        function yellowCube() {
+            const geometry = new THREE.BoxGeometry(280, 280, 280);
+            const material = new THREE.MeshLambertMaterial({ color: 0xffcc00, wireframe: false});
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(330, 600, -350);
+            cube.castShadow = true;
+            cube.receiveShadow = true;  
+
+            return cube;
+        }
+
+        // let islandLoader = new jsmLoad.GLTFLoader();
+        // islandLoader.load(islandModel, function(gltf) {
+        //     const island = gltf.scene.children[2];
+        //     island.position.set(711, 200, -150);
+        //     island.scale.set(50,50,50)
+        //     island.castShadow = true;
+        //     island.receiveShadow = true;
+        //     scene.add(gltf.scene);
+        // });
+
+        this.redCube = redCube();
+        scene.add(this.redCube);  
+
+        // keyframing
+        const positionRedCube = new THREE.VectorKeyframeTrack('.position', [0,1], [-330, 600, -350, 
+                                                                                     -330, 900, -350]);
+
+        const clip = new THREE.AnimationClip('Action', 3, [positionRedCube])
+
+        const mixer = new THREE.AnimationMixer(this.redCube);
+
+        this.mixer = mixer;
+
+        const clipAction = mixer.clipAction(clip);
+
+        clipAction.play();
+
+        this.yellowCube = yellowCube();
+        scene.add(this.yellowCube);  
+
+        this.blueCube = blueCube();
+        scene.add(this.blueCube);  
 
 
-        const cube = theCube();
-        this.cube = cube;
-        scene.add(this.cube);  
 
+        // var spotLight = new THREE.SpotLight( 0xffffff );
+        // spotLight.position.set( 1500, 4000, 350 );
 
+        // spotLight.castShadow = true;
 
-        var spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( 1500, 4000, 350 );
+        // spotLight.shadow.mapSize.width = 2048;
+        // spotLight.shadow.mapSize.height = 2048;
 
-        spotLight.castShadow = true;
+        // spotLight.shadow.camera.near = 500;
+        // spotLight.shadow.camera.far = 4000;
+        // spotLight.shadow.camera.fov = 30;
 
-        spotLight.shadow.mapSize.width = 2048;
-        spotLight.shadow.mapSize.height = 2048;
-
-        spotLight.shadow.camera.near = 500;
-        spotLight.shadow.camera.far = 4000;
-        spotLight.shadow.camera.fov = 30;
-
-        scene.add( spotLight );
+        // scene.add( spotLight );
 
 
         // bind variables
@@ -183,14 +229,22 @@ class ThreeContainer extends React.Component {
 
     animate() {
         // // console.log(this.acube.cube)
-        this.cube.rotation.x += 0.01;
-        this.cube.rotation.y += 0.01;
 
+        
         this.renderScene();
         this.frameId = window.requestAnimationFrame(this.animate);
     }
 
     renderScene() {
+        const delta = this.clock.getDelta();
+
+        if ( this.mixer ) {
+
+            this.mixer.update( delta );
+
+        }
+
+
         this.renderer.render(this.scene, this.camera);
     }
 
