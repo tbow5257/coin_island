@@ -118,18 +118,7 @@ class ThreeContainer extends React.Component {
         scene.add(this.redCube);  
 
         // keyframing
-        const positionRedCube = new THREE.VectorKeyframeTrack('.position', [0,1], [-330, 600, -350, 
-                                                                                     -330, 900, -350]);
 
-        const clip = new THREE.AnimationClip('Action', 3, [positionRedCube])
-
-        const mixer = new THREE.AnimationMixer(this.redCube);
-
-        this.mixer = mixer;
-
-        const clipAction = mixer.clipAction(clip);
-
-        clipAction.play();
 
         this.yellowCube = yellowCube();
         scene.add(this.yellowCube);  
@@ -210,6 +199,26 @@ class ThreeContainer extends React.Component {
 
     componentDidUpdate() {
         // this.cube.position.set(0, this.props.boxY, -350);
+        console.log(this.props.boxY)
+
+        this.positionRedCube = new THREE.VectorKeyframeTrack('.position', [0,1], [-330, 600, -350, 
+            -330, this.props.boxY, -350]);
+
+        this.clip = new THREE.AnimationClip('Action', 3, [this.positionRedCube])
+
+        this.mixer = new THREE.AnimationMixer(this.redCube);
+
+        this.mixer = this.mixer;
+
+        this.clipAction = this.mixer.clipAction(this.clip);
+
+        this.clipAction.clampWhenFinished = true;
+        this.clipAction.loop = THREE.LoopOnce;
+
+        // bind action to this
+        console.log(this.positionRedCube)
+        this.clipAction.play();
+
     }
 
     componentWillUnmount() {

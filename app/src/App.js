@@ -7,7 +7,7 @@ const App = () => {
     const [testMove, setTestMove] = useState(600);
 
     useEffect(() => {
-        setTimeout(() => setTestMove(300), 4000);
+        setTimeout(() => setTestMove(1100), 4000);
         
         
     }, [])
